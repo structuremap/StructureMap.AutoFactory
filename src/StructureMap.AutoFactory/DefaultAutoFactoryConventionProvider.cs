@@ -10,7 +10,7 @@ namespace StructureMap.AutoFactory
     {
         public IAutoFactoryMethodDefinition GetMethodDefinition(MethodInfo methodInfo, IList<object> arguments)
         {
-            if (methodInfo.Name.StartsWith("GetNames", StringComparison.InvariantCultureIgnoreCase)
+            if (methodInfo.Name.StartsWith("GetNames", StringComparison.OrdinalIgnoreCase)
                 && methodInfo.IsGenericMethod
                 && methodInfo.GetGenericArguments().Any()
                 && (methodInfo.ReturnType.IsAssignableFrom(typeof(List<string>))))
@@ -50,7 +50,7 @@ namespace StructureMap.AutoFactory
 
         private static string tryGetInstanceName(MethodInfo methodInfo, IList<object> arguments)
         {
-            return methodInfo.Name.StartsWith("GetNamed", StringComparison.InvariantCultureIgnoreCase)
+            return methodInfo.Name.StartsWith("GetNamed", StringComparison.OrdinalIgnoreCase)
                    && arguments.Any()
                 ? Convert.ToString(arguments.First())
                 : null;

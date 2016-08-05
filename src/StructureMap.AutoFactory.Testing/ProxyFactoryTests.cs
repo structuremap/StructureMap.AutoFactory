@@ -1,11 +1,11 @@
 using Castle.DynamicProxy;
-using Rhino.Mocks;
+using Moq;
+using Shouldly;
 using StructureMap.AutoFactory;
 using StructureMap.Pipeline;
-using System;
 using Xunit;
 
-namespace StructureMap.Testing.AutoFactories
+namespace StructureMap.AutoFactory.Testing
 {
     public class ProxyFactoryTests
     {
@@ -22,16 +22,11 @@ namespace StructureMap.Testing.AutoFactories
         {
         }
 
-        private static TDependency Stub<TDependency>() where TDependency : class
-        {
-            return MockRepository.GenerateStub<TDependency>();
-        }
-
         [Fact]
         public void Should_create_a_proxy_factory()
         {
             var proxyGenerator = new ProxyGenerator();
-            var context = Stub<IContext>();
+            var context = new Mock<IContext>().Object;
 
             var proxyFactory = new ProxyFactory<IFactory>(proxyGenerator, context, new DefaultAutoFactoryConventionProvider());
 
@@ -44,22 +39,22 @@ namespace StructureMap.Testing.AutoFactories
         public void Should_build_the_service_by_return_type_from_context()
         {
             var proxyGenerator = new ProxyGenerator();
-            var context = Stub<IContext>();
-            var container = Stub<IContainer>();
+            var contextMock = new Mock<IContext>();
+            var containerMock = new Mock<IContainer>();
 
             var service = new Service();
 
-            context.Stub(x => x.GetInstance<IContainer>()).Return(container);
-            container.Stub(x => x.TryGetInstance(Arg<Type>.Is.Same(typeof(IService)), Arg<ExplicitArguments>.Is.Anything)).Return(service);
+            contextMock.Setup(x => x.GetInstance<IContainer>()).Returns(containerMock.Object);
+            containerMock.Setup(x => x.TryGetInstance(typeof(IService), It.IsAny<ExplicitArguments>())).Returns(service);
 
-            var proxyFactory = new ProxyFactory<IFactory>(proxyGenerator, context, new DefaultAutoFactoryConventionProvider());
+            var proxyFactory = new ProxyFactory<IFactory>(proxyGenerator, contextMock.Object, new DefaultAutoFactoryConventionProvider());
 
             var factory = proxyFactory.Create();
 
             var built = factory.CreateService();
 
             built.ShouldNotBeNull();
-            built.ShouldBeTheSameAs(service);
+            built.ShouldBe(service);
         }
     }
 }

@@ -3,7 +3,7 @@ using StructureMap.AutoFactory;
 using System.Collections.Generic;
 using Xunit;
 
-namespace StructureMap.Testing.AutoFactories
+namespace StructureMap.AutoFactory.Testing
 {
     public class AutoFactoryTester
     {
